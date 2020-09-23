@@ -7,4 +7,4 @@ Lyrics plugin for Synology Audio Station/DS Audio.
 
 在https://github.com/LudySu/Synology-LrcPlugin 的基础上，更换了QQ音乐API，修复了歌词翻译功能。
 
-使用方法：直接下载[歌词插件](qqmusic.aum)并安装到Audio Station/DS Audio中。
+使用方法：直接下载[歌词插件](qqmusic.aum)并安装到Audio Station/DS Audio中，在歌曲属性-歌词中点击在线歌词，搜索QQ音乐中关联的歌词。
