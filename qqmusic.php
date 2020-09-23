@@ -1,9 +1,9 @@
 <?php
 
 // Must set to false when running on DS Station
-const DEBUG = false;
+const DEBUG = true;
 // Set to TURE is Chinese translation is needed
-const NEED_TRANSLATION = false;
+const NEED_TRANSLATION = true;
 
 
 /**
@@ -64,7 +64,7 @@ class LudysuQQLrc {
 
         if (count($exactMatchArray) != 0) {
             $songArray = $exactMatchArray;
-        } else if (count($partialMatchArray != 0)) {
+        } else if (count($partialMatchArray) != 0) {
             $songArray = $partialMatchArray;
         }
 
@@ -120,13 +120,16 @@ class LudysuQQLrc {
      */
     private function downloadLyric($music_id) {
         $response = $this->download($music_id);
+//        echo "<br>";echo "<br>";echo "<br>";
+//        var_dump($response);
+//        echo "<br>";echo "<br>";echo "<br>";echo "<br>";
         if ($this->isNullOrEmptyString($response)) {
             return NULL;
         }
 
         $json = json_decode($response, true);
         $orgLrc = $json['lyric'];
-        $transLrc = $json['tlyric']['lyric']; // Chinese translation lyric, but only some songs have
+        $transLrc = $json['trans']; // Chinese translation lyric, but only some songs have
 
         $resultLrc = $orgLrc;
         if (NEED_TRANSLATION && !$this->isNullOrEmptyString($transLrc)) {
@@ -252,9 +255,9 @@ class LudysuQQLrc {
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_URL => "https://c.y.qq.com/soso/fcgi-bin/client_search_cp?".http_build_query($params)
         ));
-
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
         $output = curl_exec($curl);
-      
         curl_close($curl);
 
         return $output;
@@ -264,8 +267,8 @@ class LudysuQQLrc {
      * Downloads a lyric for a given music_id.
      */
     private static function download($music_id) {
-        $url = "https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_yqq.fcg?nobase64=1&musicid=" . $music_id . "&format=json";
-        
+//        $url = "https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg?nobase64=1&musicid=" . $music_id . "&format=json";
+        $url = "https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg?nobase64=1&g_tk=5381&musicid=" . $music_id . "&format=json";
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
@@ -275,6 +278,8 @@ class LudysuQQLrc {
             ),
             CURLOPT_RETURNTRANSFER => true
         ));
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
         $output = curl_exec($curl);
         curl_close($curl);
         return $output;
@@ -332,13 +337,14 @@ if (DEBUG == true) {
     /**
      * Main
      */
-    $title = "微光";
-    $artist = "梁静茹";
+    $title = "Bloody Stream";
+    $artist = "Coda";
     echo "Trying to find lyrics for ['$title'] by artist ['$artist'] ...</br>";
 
     $testObj = new TestObj();
     $downloader = (new ReflectionClass("LudysuQQLrc"))->newInstance();
     $count = $downloader->getLyricsList($artist, $title, $testObj);
+    echo $count;
     if ($count > 0) {
         $item = $testObj->getFirstItem();
         // var_dump($item);
